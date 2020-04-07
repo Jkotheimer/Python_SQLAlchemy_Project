@@ -40,21 +40,25 @@ def about():
 @app.route("/assign", methods=['GET', 'POST'])
 def assign_page():
 	form = AssignForm()
-	print("FUCK")
+	# if the form has been submitted, confirm the entry and commit it to the database
 	if form.validate_on_submit():
-		print("HEREEEEE")
 		ssn = form.Employee.data
 		pid = form.Project.data
 		confirmation = Works_on.query.filter_by(SSN=ssn).filter_by(ProjectID=pid).all()
 		if confirmation:
-			print("Exists")
 			flash('The specified employee is alread working on this project', 'danger')
 			return render_template('assign.html', title='Assign', form=form)
 		assignment = Works_on(SSN = ssn, ProjectID = pid)
 		db.session.add(assignment)
 		db.session.commit()
 		return redirect(url_for('home'))
+	# else just return the form page
 	return render_template('assign.html', title='Assign', form=form)
+
+@app.route("/remove", methods=['GET', 'POST'])
+def remove():
+	form = RemovalForm()
+
 	
 @app.route("/employee/<ssn>")
 def employee(ssn):
