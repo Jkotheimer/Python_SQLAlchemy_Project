@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="media">
+    <div class="media-body">
+      <h2 class="account-heading">{{ employee }}'s Projects</h2>
+    </div>
+  </div>
+    {% for proj in projects %}
+        <article class="media content-section">
+          <div class="media-body">
+            <h2>
+	    	<a href="{{ url_for('project', ID=proj) }}">Project {{ proj }}: {{ projects[proj] }}</a>
+	    </h2>
+	  </div>
+        </article>
+    {% endfor %}
+{% endblock content %}
