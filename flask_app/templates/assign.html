@@ -2,38 +2,38 @@
 {% block content %}
     <div class="content-section">
         <form method="POST" action="">
-            {{ form.hidden_tag() }}
+	    {{ form.csrf_token }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Join Today</legend>
+                <legend class="border-bottom mb-4">Assign an employee to a project</legend>
                 <div class="form-group">
-                    {{ form.SSN.label(class="form-control-label") }}
-                    {% if form.SSN.errors %}
+                    {{ form.Employee.label(class="form-control-label") }}
+                    {% if form.Employee.errors %}
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.SSN.errors %}
+                            {% for error in form.Employee.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.SSN(class="form-control form-control-lg") }}
+                        {{ form.Employee(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.ProjectID.label(class="form-control-label") }}
-                    {% if form.ProjectID.errors %}
-                        {{ form.ProjectID(class="form-control form-control-lg is-invalid") }}
+                    {{ form.Project.label(class="form-control-label") }}
+                    {% if form.Project.errors %}
+                        {{ form.Project(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.ProjectID.errors %}
+                            {% for error in form.Project.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.ProjectID(class="form-control form-control-lg") }}
+                        {{ form.Project(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
             </fieldset>
             <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+                {{ form.Submit(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>
