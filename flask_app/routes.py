@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flask_app import app, db, bcrypt
-from flask_app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, DeptForm,DeptUpdateForm
-from flask_app.models import User, Post,Department, Dependent, Dept_Locations, Employee, Project, Works_On
+from flask_app.forms import AssignForm
+from flask_app.models import Employee, Project, Works_on
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 
@@ -12,43 +12,67 @@ from datetime import datetime
 @app.route("/")
 @app.route("/home")
 def home():
-    results = Department.query.all()
-    return render_template('dept_home.html', outString = results)
-    posts = Post.query.all()
-    return render_template('home.html', posts=posts)
-    results2 = Faculty.query.join(Qualified,Faculty.facultyID == Qualified.facultyID) \
-               .add_columns(Faculty.facultyID, Faculty.facultyName, Qualified.Datequalified, Qualified.courseID) \
-               .join(Course, Course.courseID == Qualified.courseID).add_columns(Course.courseName)
-    results = Faculty.query.join(Qualified,Faculty.facultyID == Qualified.facultyID) \
-              .add_columns(Faculty.facultyID, Faculty.facultyName, Qualified.Datequalified, Qualified.courseID)
-    return render_template('join.html', title='Join',joined_1_n=results, joined_m_n=results2)
-
-   
-
+	results = Works_on.query \
+		.order_by(Works_on.ProjectID.asc()) \
+		.join(Project, Project.ID == Works_on.ProjectID) \
+		.add_columns(Project.Name) \
+		.join(Employee, Employee.SSN == Works_on.SSN) \
+		.add_columns(Employee.Name).all()
+	# Convert the SQL query results into a usable data structure
+	work = dict()
+	lastID = -1 
+	for result in results:
+		if result.Works_on.ProjectID != lastID:
+			lastID = result.Works_on.ProjectID
+			work[lastID] = dict()
+			work[lastID]['Name'] = result[1]
+			work[lastID]['Employees'] = list()
+		next_employee = (result.Works_on.SSN, result[2])
+		work[lastID]['Employees'].append(next_employee)
+	print(work)
+	return render_template('home.html', title='Project Management Tool', work=work)
+	'''posts = Post.query.all()
+	return render_template('home.html', posts=posts)
+	results2 = Faculty.query.join(Qualified,Faculty.facultyID == Qualified.facultyID) \
+		.add_columns(Faculty.facultyID, Faculty.facultyName, Qualified.Datequalified, Qualified.courseID) \
+		.join(Course, Course.courseID == Qualified.courseID).add_columns(Course.courseName)
+	results = Faculty.query.join(Qualified,Faculty.facultyID == Qualified.facultyID) \
+		.add_columns(Faculty.facultyID, Faculty.facultyName, Qualified.Datequalified, Qualified.courseID)
+	return render_template('join.html', title='Join',joined_1_n=results, joined_m_n=results2)'''
 
 @app.route("/about")
 def about():
-    return render_template('about.html', title='About')
+	return render_template('about.html', title='About')
 
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
-        flash('Your account has been created! You are now able to log in', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+@app.route("/assign")
+def assign_page():
+	form = AssignForm()
+	return render_template('assign.html', title='Assign', form=form)
 
+@app.route("/employee/<ssn>")
+def employee(ssn):
+	results = Works_on.query.filter_by(SSN=ssn) \
+		.order_by(Works_on.ProjectID.asc()) \
+		.join(Project, Project.ID == Works_on.ProjectID) \
+		.add_columns(Project.Name) \
+		.join(Employee, Employee.SSN == ssn) \
+		.add_columns(Employee.Name).all()
+	# Convert the SQL query results into a usable data structure
+	print(results)
+	
+	projects = dict()
+	for result in results:
+		projects[result.Works_on.ProjectID] = result[1]	
+	return render_template('employee.html', title='Project Management Tool', projects=projects, employee=result[2])
 
+@app.route("/project/<ID>")
+def project(ID):
+	return null
+'''
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
+	if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
@@ -159,3 +183,4 @@ def delete_dept(dnumber):
     db.session.commit()
     flash('The department has been deleted!', 'success')
     return redirect(url_for('home'))
+'''
