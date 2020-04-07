@@ -5,31 +5,18 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError,Regexp
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flask_app import db
-from flask_app.models import User, Department, getDepartment, getDepartmentFactory
+from flask_app.models import Employee, Project, Works_on
 from wtforms.fields.html5 import DateField
 
-ssns = Department.query.with_entities(Department.mgr_ssn).distinct()
-#  or could have used ssns = db.session.query(Department.mgr_ssn).distinct()
-# for that way, we would have imported db from flaskDemo, see above
-
-myChoices2 = [(row[0],row[0]) for row in ssns]  # change
-results=list()
-for row in ssns:
-    rowDict=row._asdict()
-    results.append(rowDict)
-myChoices = [(row['mgr_ssn'],row['mgr_ssn']) for row in results]
-regex1='^((((19|20)(([02468][048])|([13579][26]))-02-29))|((20[0-9][0-9])|(19[0-9][0-9]))-((((0[1-9])'
-regex2='|(1[0-2]))-((0[1-9])|(1\d)|(2[0-8])))|((((0[13578])|(1[02]))-31)|(((0[1,3-9])|(1[0-2]))-(29|30)))))$'
-regex=regex1 + regex2
+class AssignForm(FlaskForm):
+	SSN = StringField('SSN', validators=[DataRequired(), Length(9)])
+	ProjectID = IntegerField('Project ID', validators=[DataRequired()])
 
 
-
-
+'''
 class RegistrationForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
+	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+	email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
@@ -118,4 +105,4 @@ class DeptForm(DeptUpdateForm):
         dept = Department.query.filter_by(dnumber=dnumber.data).first()
         if dept:
             raise ValidationError('That department number is taken. Please choose a different one.')
-
+'''
