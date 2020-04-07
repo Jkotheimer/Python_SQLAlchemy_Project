@@ -1,1 +1,3 @@
 sql_config.py
+*.backup
+/__pycache__/
