@@ -5,7 +5,8 @@
           <div class="media-body">
             <h2>Project {{ project }}: {{ work[project].Name }}</h2>
 	    {% for emp in work[project].Employees %}
-              <a class="article-content" href="{{ url_for('employee', ssn=emp[0]) }}">{{ emp[1] }}</>
+              <a class="article-content" href="{{ url_for('employee', ssn=emp[0]) }}">{{ emp[1] }}<a/>
+	      <br/>
             {% endfor %}
 	  </div>
         </article>
