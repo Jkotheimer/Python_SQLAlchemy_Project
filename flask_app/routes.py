@@ -37,11 +37,25 @@ def about():
 	return render_template('about.html', title='About')
 
 
-@app.route("/assign")
+@app.route("/assign", methods=['GET', 'POST'])
 def assign_page():
 	form = AssignForm()
+	print("FUCK")
+	if form.validate_on_submit():
+		print("HEREEEEE")
+		ssn = form.Employee.data
+		pid = form.Project.data
+		confirmation = Works_on.query.filter_by(SSN=ssn).filter_by(ProjectID=pid).all()
+		if confirmation:
+			print("Exists")
+			flash('The specified employee is alread working on this project', 'danger')
+			return render_template('assign.html', title='Assign', form=form)
+		assignment = Works_on(SSN = ssn, ProjectID = pid)
+		db.session.add(assignment)
+		db.session.commit()
+		return redirect(url_for('home'))
 	return render_template('assign.html', title='Assign', form=form)
-
+	
 @app.route("/employee/<ssn>")
 def employee(ssn):
 	results = Works_on.query.filter_by(SSN=ssn) \
@@ -73,10 +87,10 @@ def project(ID):
 
 
 '''
-@app.route("/login", methods=['GET', 'POST'])
+@app.route("/login")
 def login():
 	if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return 
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
