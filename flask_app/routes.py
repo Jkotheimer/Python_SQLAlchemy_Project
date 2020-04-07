@@ -31,14 +31,6 @@ def home():
 		work[lastID]['Employees'].append(next_employee)
 	print(work)
 	return render_template('home.html', title='Project Management Tool', work=work)
-	'''posts = Post.query.all()
-	return render_template('home.html', posts=posts)
-	results2 = Faculty.query.join(Qualified,Faculty.facultyID == Qualified.facultyID) \
-		.add_columns(Faculty.facultyID, Faculty.facultyName, Qualified.Datequalified, Qualified.courseID) \
-		.join(Course, Course.courseID == Qualified.courseID).add_columns(Course.courseName)
-	results = Faculty.query.join(Qualified,Faculty.facultyID == Qualified.facultyID) \
-		.add_columns(Faculty.facultyID, Faculty.facultyName, Qualified.Datequalified, Qualified.courseID)
-	return render_template('join.html', title='Join',joined_1_n=results, joined_m_n=results2)'''
 
 @app.route("/about")
 def about():
@@ -59,7 +51,6 @@ def employee(ssn):
 		.join(Employee, Employee.SSN == ssn) \
 		.add_columns(Employee.Name).all()
 	# Convert the SQL query results into a usable data structure
-	print(results)
 	
 	projects = dict()
 	for result in results:
@@ -68,7 +59,19 @@ def employee(ssn):
 
 @app.route("/project/<ID>")
 def project(ID):
-	return null
+	results = Works_on.query.filter_by(ProjectID=ID) \
+		.join(Project, Project.ID == ID) \
+		.add_columns(Project.Name) \
+		.join(Employee, Employee.SSN == Works_on.SSN) \
+		.add_columns(Employee.Name).all()
+	# Convert the SQL query results into a usable data structure
+	
+	employees = dict()
+	for result in results:
+		employees[result.Works_on.SSN] = result[2]	
+	return render_template('project.html', title='Project Management Tool', employees=employees, project=result[1])
+
+
 '''
 @app.route("/login", methods=['GET', 'POST'])
 def login():
