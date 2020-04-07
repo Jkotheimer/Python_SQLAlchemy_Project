@@ -2,7 +2,7 @@
 
 SQL_PATH=$1
 cd "$(dirname "${BASH_SOURCE[0]}")"
-[ ! $SQL_PATH ] && SQL_PATH=create_db.sql
+[ ! $SQL_PATH ] && SQL_PATH=sql/create_db.sql
 
 if [[ ! -f flask_app/sql_config.py || "$1" == "reset" || "$2" == "reset" ]]; then
 	read -p "MySQL username: " username
