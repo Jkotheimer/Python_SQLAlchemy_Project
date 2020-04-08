@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <h2 class="account-heading">All {{ entity_type }}s</h2>
+	    {% for entity in entities %}
+        <div class="media">
+          <div class="media-body">
+		    {% if entity.ID %}
+		    <a href="{{ url_for(entity_type, ID=entity.ID) }}">{{ entity.Name }}</a>
+			{% elif entity.SSN %}
+		    <a href="{{ url_for(entity_type, ssn=entity.SSN) }}">{{ entity.Name }}</a>
+			{% endif %}
+          </div>
+        </div>
+		{% endfor %}
+	</div>
+    <div class="content-section">
+        <form method="POST" action="">
+	    {{ form.csrf_token }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Assign an employee to a project</legend>
+                <div class="form-group">
+                    {{ form.Name.label(class="form-control-label") }}
+                    {% if form.Name.errors %}
+                        {{ form.Name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.Name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.Name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+				{% if form.SSN %}
+                <div class="form-group">
+                    {{ form.SSN.label(class="form-control-label") }}
+                    {% if form.SSN.errors %}
+                        {{ form.SSN(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.SSN.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.SSN(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+				{% endif %}
+            </fieldset>
+            <div class="form-group">
+                {{ form.Submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+{% endblock content %}
