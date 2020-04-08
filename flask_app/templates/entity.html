@@ -22,7 +22,7 @@
         <form method="POST" action="">
 	    {{ form.csrf_token }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Assign an employee to a project</legend>
+                <legend class="border-bottom mb-4">{{ title }}</legend>
                 <div class="form-group">
                     {{ form.Name.label(class="form-control-label") }}
                     {% if form.Name.errors %}
