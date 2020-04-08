@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField, RadioField, HiddenField
+from wtforms import SubmitField, SelectField, RadioField, HiddenField, StringField
 from wtforms.validators import DataRequired, Length
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flask_app import db
@@ -20,8 +20,8 @@ class AssignForm(FlaskForm):
 	Submit = SubmitField('Assign')
 
 class RemovalForm(FlaskForm):
-	Employees = RadioField()
-	Projects = RadioField()
+	Employees = RadioField(validators=[DataRequired()])
+	Projects = RadioField(validators=[DataRequired()])
 	Submit = SubmitField('Remove')
 
 	def setEmployee(self, ssn):
@@ -61,3 +61,12 @@ class RemovalForm(FlaskForm):
 			return True
 		else:
 			return False
+
+class EmployeeForm(FlaskForm):
+	Name = StringField('Employee Name', validators=[DataRequired(), Length(min=2, max=32)])
+	SSN = StringField('Employee SSN', validators=[DataRequired(), Length(min=9, max=9)])
+	Submit = SubmitField('Add Employee')
+
+class ProjectForm(FlaskForm):
+	Name = StringField('New Project Name', validators=[DataRequired(), Length(min=2, max=32)])
+	Submit = SubmitField('Add Project')
