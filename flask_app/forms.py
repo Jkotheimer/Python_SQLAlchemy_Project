@@ -39,10 +39,10 @@ class RemovalForm(FlaskForm):
 			# Convert the SQL query results into a usable data structure
 			choices = list()
 			for result in results:
-				choices.append((result.Works_on.ProjectID, 'Project {}: {}'.format(result.Works_on.ProjectID, result[1])))
+				choices.append((result.Works_on.ProjectID, result[1]))
 			self.EmployeeName = result[2]
 			self.Projects.choices = choices
-			self.Submit.label.text = 'Remove project from this employee'
+			self.Submit.label.text = 'Remove Project'
 			return True
 		else:
 			return False
@@ -61,7 +61,7 @@ class RemovalForm(FlaskForm):
 				choices.append((result.Works_on.SSN, result[2]))
 			self.ProjectName = result[1]
 			self.Employees.choices = choices
-			self.Submit.label.text = 'Remove employee from this project'
+			self.Submit.label.text = 'Remove Employee'
 			return True
 		else:
 			return False
