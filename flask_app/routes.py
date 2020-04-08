@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flask_app import app, db, bcrypt
-from flask_app.forms import AssignForm, RemovalForm
+from flask_app.forms import AssignForm, RemovalForm, EmployeeForm, ProjectForm
 from flask_app.models import Employee, Project, Works_on
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
@@ -29,13 +29,11 @@ def home():
 			work[lastID]['Employees'] = list()
 		next_employee = (result.Works_on.SSN, result[2])
 		work[lastID]['Employees'].append(next_employee)
-	print(work)
 	return render_template('home.html', title='Project Management Tool', work=work)
 
 @app.route("/about")
 def about():
 	return render_template('about.html', title='About')
-
 
 @app.route("/assign", methods=['GET', 'POST'])
 def assign_page():
@@ -54,29 +52,64 @@ def assign_page():
 		return redirect(url_for('home'))
 	# else just return the form page
 	return render_template('assign.html', title='Assign Project', form=form)
-	
-@app.route("/employee/<ssn>", methods=['GET', 'POST'])
+
+@app.route("/employees", methods=['GET', 'POST'])
+def employees():
+	form = EmployeeForm()
+	employees = Employee.query.all()
+	if form.validate_on_submit():
+		print("Submitted")
+		Name = form.Name.data
+		SSN = form.SSN.data
+		result = Employee.query.filter_by(SSN=SSN).all()
+		if result:
+				flash('Employee with SSN: {} already exists'.format(SSN), 'danger')
+		else:
+			Emp = Employee(SSN=SSN, Name=Name)
+			db.session.add(Emp)
+			db.session.commit()
+			flash('Employee successfully added!', 'success')
+			return redirect(url_for('employees'))
+	return render_template('entity.html', title='Add an employee', form=form, entities=employees, entity_type='employee')
+
+@app.route("/employees/<ssn>", methods=['GET', 'POST'])
 def employee(ssn):
 	form = RemovalForm()
-	eName = Employee.query.filter_by(SSN=ssn).first().Name
+	eName = Employee.query.filter_by(SSN=ssn).first()
+	if not eName:
+		flash('Employee with SSN {} does not exist'.format(ssn), 'danger')
+		return redirect(url_for('home'))
+	eName = eName.Name
 	if not form.setEmployee(ssn):
-		if eName:
-			return render_template('employee.html', title=eName)
-		else:
-			flash('Employee with SSN {} does not exist'.format(ssn), 'danger')
-			return redirect(url_for('home'))
+		return render_template('employee.html', title=eName)
 	if form.is_submitted():
 		projectId = form.Projects.data
 		relation = Works_on.query.filter_by(SSN=ssn).filter_by(ProjectID=projectId).first()
-		db.session.delete(relation)
-		db.session.commit()
-
-		pName = Project.query.filter_by(ID=projectId).first().Name
-		flash('{} has been removed from {}'.format(eName, pName), 'success')
-		return redirect(url_for('home'))
+		if relation:
+			db.session.delete(relation)
+			db.session.commit()
+			pName = Project.query.filter_by(ID=projectId).first().Name
+			flash('{} has been removed from {}'.format(eName, pName), 'success')
+		else:
+			flash('Relationship not found', 'danger')
+		return redirect(url_for('employee', ssn=ssn))
 	return render_template('employee.html', title=eName, form=form)
 
-@app.route("/project/<ID>", methods=['GET', 'POST'])
+@app.route("/projects", methods=['GET', 'POST'])
+def projects():
+	form = ProjectForm()
+	projects = Project.query.all()
+	if form.validate_on_submit():
+		print("Submitted")
+		Name = form.Name.data
+		Proj = Project(Name=Name)
+		db.session.add(Proj)
+		db.session.commit()
+		flash('Project added', 'success')
+		return redirect(url_for('projects'))
+	return render_template('entity.html', title='Add a project', form=form, entities=projects, entity_type="project")
+
+@app.route("/projects/<ID>", methods=['GET', 'POST'])
 def project(ID):
 	form = RemovalForm()
 	pName = Project.query.filter_by(ID=ID).first().Name
@@ -89,10 +122,12 @@ def project(ID):
 	if form.is_submitted():
 		ssn = form.Employees.data
 		relation = Works_on.query.filter_by(SSN=ssn).filter_by(ProjectID=ID).first()
-		db.session.delete(relation)
-		db.session.commit()
-		
-		eName = Employee.query.filter_by(SSN=ssn).first().Name
-		flash('{} has been removed from {}'.format(eName, pName), 'success')
-		return redirect(url_for('home'))
+		if relation:
+			db.session.delete(relation)
+			db.session.commit()
+			eName = Employee.query.filter_by(SSN=ssn).first().Name
+			flash('{} has been removed from {}'.format(eName, pName), 'success')
+		else:
+			flash('Relationship not found', 'danger')
+		return redirect(url_for('project', ID=ID))	
 	return render_template('project.html', title=pName, form=form)
