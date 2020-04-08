@@ -102,6 +102,20 @@ def projects():
 	if form.validate_on_submit():
 		print("Submitted")
 		Name = form.Name.data
+		results = Project.query.filter_by(Name=Name).first()
+		'''
+		If a project with this name already exists, start counting from 2 and check for
+		any other projects with the same name, but a number after it. If the count is free,
+		make that the new name of the project
+		'''
+		if results:
+			count = 2
+			tempName = Name
+			while results:
+				tempName = Name + ' ' + str(count)
+				results = Project.query.filter_by(Name=tempName).first()
+				count += 1
+			Name = tempName
 		Proj = Project(Name=Name)
 		db.session.add(Proj)
 		db.session.commit()
