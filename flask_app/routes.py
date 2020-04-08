@@ -57,7 +57,7 @@ def assign_page():
 @app.route("/employees", methods=['GET', 'POST'])
 def employees():
 	form = EmployeeForm()
-	employees = Employee.query.all()
+	employees = Employee.query.order_by(Employee.SSN.asc()).all()
 	if form.validate_on_submit():
 		print("Submitted")
 		Name = form.Name.data
@@ -99,9 +99,8 @@ def employee(ssn):
 @app.route("/projects", methods=['GET', 'POST'])
 def projects():
 	form = ProjectForm()
-	projects = Project.query.all()
+	projects = Project.query.order_by(Project.ID.asc()).all()
 	if form.validate_on_submit():
-		print("Submitted")
 		Name = form.Name.data
 		results = Project.query.filter_by(Name=Name).first()
 		'''
