@@ -6,9 +6,13 @@
         <div class="media">
           <div class="media-body">
 		    {% if entity.ID %}
-		    <a href="{{ url_for(entity_type, ID=entity.ID) }}">{{ entity.Name }}</a>
+		    <a href="{{ url_for(entity_type, ID=entity.ID) }}">
+			  {{ entity.ID|string + ' : ' + entity.Name }}
+			</a>
 			{% elif entity.SSN %}
-		    <a href="{{ url_for(entity_type, ssn=entity.SSN) }}">{{ entity.Name }}</a>
+		    <a href="{{ url_for(entity_type, ssn=entity.SSN) }}">
+			  {{ entity.SSN + ' : ' + entity.Name }}
+			</a>
 			{% endif %}
           </div>
         </div>

@@ -5,20 +5,19 @@
   {{ form.csrf_token }}
   <div class="media">
     <div class="media-body">
-      <h2 class="account-heading">{{ form.EmployeeName }}'s Projects</h2>
+      <h1 class="account-heading">{{ title }}</h1>
     </div>
   </div>
   {{ form.Employee }}
+  <fieldset class="form-group">
+    <legend class="border-bottom mb-4">Projects</legend>
   {% for proj in form.Projects %}
-    <article class="media content-section">
-      <div class="media-body">
-        <h2>
-          {{ proj.label }}
-	  <span>{{ proj }}</span>
-        </h2>
+      <div class="form-group">
+        {{ proj.label }}
+	    <span>{{ proj }}</span>
       </div>
-    </article>
   {% endfor %}
+  </fieldset>
   {{ form.Submit }}
 </form>
 {% else %}
