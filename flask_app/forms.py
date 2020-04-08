@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField
+from wtforms import SubmitField, SelectField, RadioField, HiddenField
 from wtforms.validators import DataRequired, Length
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flask_app import db
@@ -18,3 +18,46 @@ class AssignForm(FlaskForm):
 	Employee = SelectField('Employee', choices=employees)  # myChoices defined at top
 	Project = SelectField('Project', choices=projects)
 	Submit = SubmitField('Assign')
+
+class RemovalForm(FlaskForm):
+	Employees = RadioField()
+	Projects = RadioField()
+	Submit = SubmitField('Remove')
+
+	def setEmployee(self, ssn):
+		results = Works_on.query.filter_by(SSN=ssn) \
+			.order_by(Project.ID.asc()) \
+			.join(Project, Project.ID == Works_on.ProjectID) \
+			.add_columns(Project.Name) \
+			.join(Employee, Employee.SSN == Works_on.SSN) \
+			.add_columns(Employee.Name).all()
+		if results:
+			# Convert the SQL query results into a usable data structure
+			choices = list()
+			for result in results:
+				choices.append((result.Works_on.ProjectID, 'Project {}: {}'.format(result.Works_on.ProjectID, result[1])))
+			self.EmployeeName = result[2]
+			self.Projects.choices = choices
+			self.Submit.label.text = 'Remove project from this employee'
+			return True
+		else:
+			return False
+	
+	def setProject(self, Id):
+		results = Works_on.query.filter_by(ProjectID=Id) \
+			.order_by(Employee.Name.asc()) \
+			.join(Project, Project.ID == Works_on.ProjectID) \
+			.add_columns(Project.Name) \
+			.join(Employee, Employee.SSN == Works_on.SSN) \
+			.add_columns(Employee.Name).all()
+		if results:
+			# Convert the SQL query results into a usable data structure
+			choices = list()
+			for result in results:
+				choices.append((result.Works_on.SSN, result[2]))
+			self.ProjectName = result[1]
+			self.Employees.choices = choices
+			self.Submit.label.text = 'Remove employee from this project'
+			return True
+		else:
+			return False
