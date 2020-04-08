@@ -1,17 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
+{% if form %}
+<form method="POST" action="">
+  {{ form.csrf_token }}
   <div class="media">
     <div class="media-body">
-      <h2 class="account-heading">Employees working on {{ project }}</h2>
+      <h2 class="account-heading">Employees working on {{ form.ProjectName }}</h2>
     </div>
   </div>
-    {% for emp in employees %}
-        <article class="media content-section">
-          <div class="media-body">
-            <h2>
-	    	<a href="{{ url_for('employee', ssn=emp) }}">{{ employees[emp] }}</a>
-	    </h2>
-	  </div>
-        </article>
-    {% endfor %}
+  {{ form.Project }}
+  {% for emp in form.Employees %}
+    <article class="media content-section">
+      <div class="media-body">
+        <h2>
+          {{ emp.label }}
+	  <span>{{ emp }}</span>
+        </h2>
+      </div>
+    </article>
+  {% endfor %}
+  {{ form.Submit }}
+</form>
+{% else %}
+  <div class="media">
+    <div class="media-body">
+      <h2 class="account-heading">Nobody is working on {{ ProjectName }}</h2>
+    </div>
+  </div>
+
+{% endif %}
 {% endblock content %}
