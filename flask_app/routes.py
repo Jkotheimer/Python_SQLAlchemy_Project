@@ -38,6 +38,7 @@ def about():
 @app.route("/assign", methods=['GET', 'POST'])
 def assign_page():
 	form = AssignForm()
+	form.set()
 	# if the form has been submitted, confirm the entry and commit it to the database
 	if form.validate_on_submit():
 		ssn = form.Employee.data
