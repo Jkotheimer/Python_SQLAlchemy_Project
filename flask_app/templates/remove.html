@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+  <form method="POST" action="">
+    {% for project in form.Projects %}
+        <article class="media content-section">
+          <div class="media-body">
+	      <h3>{{ project.label }}</h3>
+              <div class="article-content">{{ project }} {{ form.Employees[loop.index - 1] }}</div>
+	  </div>
+        </article>
+    {% endfor %}
+    {{ form.Submit(class="btn btn-outline-info") }}
+  </form>
+{% endblock content %}
